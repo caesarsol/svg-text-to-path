@@ -2,7 +2,7 @@
 
 ## Installing
 
-Clone the repo, the main executable is `./svg-ttp.rb`.
+Clone the repo, the main executable is `./ttp.rb`.
 
 ## Testing
 
