@@ -1,3 +1,4 @@
 source 'https://rubygems.org'
 
-gem 'nokogiri'
+# Specify your gem's dependencies in the gemspec file.
+gemspec

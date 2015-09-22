@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+require 'svg_file'
+
+svg_input   = ARGV[0]
+svg_output  = ARGV[1]
+
+DEBUG = ARGV.include? '--debug'
+
+fonts_path = File.expand_path("../fonts/", File.dirname(__FILE__))
+
+fontlist = Dir[File.join(fonts_path, '*')].map{ |f| [f.sub(%r(.*/(.*?)\.svg), '\1'), f] }.to_h
+
+puts "DEBUG Mode" if DEBUG
+svg = SVGFile.new(svg_input)
+svg.textToPath(fontlist, debug: DEBUG)
+svg.save(svg_output)
+puts "Generated #{svg_output}"

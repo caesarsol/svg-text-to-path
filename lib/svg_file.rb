@@ -22,21 +22,11 @@ class SVGFile
     end
   end
 
-  def getFont(font_family, fonts_dir = './fonts')
-    fonts_dir = File.expand_path(fonts_dir)
-    SVGFont.cached_or_new(File.join(fonts_dir, "#{font_family}.svg"))
+  def getFont(font_family, fonts_paths)
+    SVGFont.cached_or_new(fonts_paths[font_family])
   end
 
-  def _readFontProperties(node)
-    _font_family = node.attribute('font-family').to_s.gsub(/'/,'')
-    _font_family = "Impact" if _font_family == '' # FIXME: sane default
-    font = getFont(_font_family)
-    asize = node.attribute('font-size').to_s.to_f
-    fill_color = node.attribute('fill').to_s
-    [font, asize, fill_color]
-  end
-
-  def textToPath(opts = {})
+  def textToPath(fonts_paths, opts = {})
     # <text transform="matrix(1 0 0 1 673.9766 1141.3555)">   ## (scaleX skew1 skew2 scaleY posX posY)
     #   <tspan fill="#FFFFFF" font-family="'ProximaNova-Regular'" font-size="12" x="0" y="0">Lorem ipsum dolor </tspan>
     # </text>
@@ -47,12 +37,14 @@ class SVGFile
       x = match.nil? ? 0.0 : match[1].to_f
       y = match.nil? ? 0.0 : match[2].to_f
       if text_node.attribute('font-family') # FIXME: should see if it contains only plain text or tags.
-        font, asize, fill_color = _readFontProperties(text_node)
+        font_family, asize, fill_color = readFontProperties(text_node)
+        font = getFont(font_family, fonts_paths)
         xml_text << font.tspanToPath(text_node.text, x, y, asize, fill_color, opts)
       else
         text_node.css('tspan').each do |span_node|
           # aggiungi gruppo
-          font, asize, fill_color = _readFontProperties(span_node)
+          font_family, asize, fill_color = readFontProperties(span_node)
+          font = getFont(font_family, fonts_paths)
           span_x = x + span_node.attribute('x').to_s.to_f
           span_y = y + span_node.attribute('y').to_s.to_f
           xml_text << font.tspanToPath(span_node.text, span_x, span_y, asize, fill_color, opts)
@@ -74,5 +66,15 @@ class SVGFile
     File.open(filename, 'w') do |file|
       file.write build_xml
     end
+  end
+
+  private
+
+  def readFontProperties(node)
+    font_family = node.attribute('font-family').to_s.gsub(/'/,'')
+    font_family = "Impact" if font_family == '' # FIXME: sane default
+    asize = node.attribute('font-size').to_s.to_f
+    fill_color = node.attribute('fill').to_s
+    [font_family, asize, fill_color]
   end
 end
