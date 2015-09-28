@@ -18,8 +18,8 @@ Gem::Specification.new do |s|
   s.bindir        = "bin"
   s.executables   = ["svg-ttp"]
 
-  s.add_dependency 'nokogiri'
+  s.add_dependency 'nokogiri', '~> 1'
 
-  s.add_development_dependency 'bundler', '~> 1.9'
-  s.add_development_dependency 'rake',    '~> 10.0'
+  s.add_development_dependency 'bundler', '~> 1'
+  s.add_development_dependency 'rake',    '~> 10'
 end
